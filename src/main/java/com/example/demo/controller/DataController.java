@@ -23,12 +23,13 @@ public class DataController {
 
     @RequestMapping(path = {"/addData"}, method = {RequestMethod.GET})
     public String register(Model model,
-                          //@RequestParam(value = "id") int id,
+                           @RequestParam(value = "id") int id,
                            @RequestParam(value = "date")String date,
                            @RequestParam(value = "userBehavior") int userBehavior,
                            @RequestParam(value = "showName", defaultValue = "null") String showName) {
 
         Data data = new Data();
+        data.setId(id);
         data.setDate(date);
         data.setShowName(showName);
         data.setUserBehavior(userBehavior);
