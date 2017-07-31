@@ -1,45 +1,59 @@
 package com.example.demo.model;
 
-import java.util.Date;
 
 /**
  * Created by LZF on 2017/7/7.
  */
 public class Data {
-    private int id;
+    private int userId;
     private String date;
     private int userBehavior;
-    private String showName;
+    private int showName;
 
-    public int getId() {
-        return id;
+
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public Data setUserId(int userId) {
+        this.userId = userId;
+        return this;
     }
 
     public String getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public Data setDate(String date) {
         this.date = date;
+        return this;
     }
 
     public int getUserBehavior() {
         return userBehavior;
     }
 
-    public void setUserBehavior(int userBehavior) {
+    public Data setUserBehavior(int userBehavior) {
         this.userBehavior = userBehavior;
+        return this;
     }
 
-    public String getShowName() {
+    public int getShowName() {
         return showName;
     }
 
-    public void setShowName(String showName) {
+    public Data setShowName(int showName) {
         this.showName = showName;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Data{" +
+                "userId='" + userId + '\'' +
+                ", date='" + date + '\'' +
+                ", userBehavior=" + userBehavior +
+                ", showName='" + showName + '\'' +
+                '}';
     }
 }

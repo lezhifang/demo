@@ -2,8 +2,11 @@ package com.example.demo.service;
 
 import com.example.demo.dao.DataDAO;
 import com.example.demo.model.Data;
+import com.example.demo.model.WatchTVNum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by LZF on 2017/7/7.
@@ -11,14 +14,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataService {
     @Autowired
-    private DataDAO dataDAO;
-
+    public DataDAO dataDAO;
 
     public int addData(Data data){
         return dataDAO.addData(data);
     }
 
-    public Data selectById(int id){
-        return dataDAO.selectById(id);
+    public List<Integer> selectUserIdBydate(String date){
+        return dataDAO.selectUserIdBydate(date);
     }
+
 }
