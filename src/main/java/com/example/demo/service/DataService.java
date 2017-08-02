@@ -2,7 +2,6 @@ package com.example.demo.service;
 
 import com.example.demo.dao.DataDAO;
 import com.example.demo.model.Data;
-import com.example.demo.model.WatchTVNum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ public class DataService {
         return dataDAO.addData(data);
     }
 
-    public List<Integer> selectUserIdBydate(String date){
+    public List<Data> selectUserIdBydate(String date){
         return dataDAO.selectUserIdBydate(date);
     }
 

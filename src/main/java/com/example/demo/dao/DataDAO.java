@@ -21,8 +21,6 @@ public interface DataDAO {
             ") values (#{userId},#{date},#{userBehavior},#{showName})"})
     int addData(Data data);
 
-//    @Select({"select ", INSERT_FIELDS,",count(user_id) as user_id from ", TABLE_NAME, "group by show_name"})
-//    List<Data> getEveryshowNameCount();
-    @Select({"select user_id from ", TABLE_NAME, "where date > #{date}"})
-    List<Integer> selectUserIdBydate(String date);
+    @Select({"select ", SELECT_FIELDS, " from ", TABLE_NAME, "where date > #{date}"})
+    List<Data> selectUserIdBydate(String date);
 }

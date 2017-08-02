@@ -15,16 +15,20 @@ public class Main {
 			user.start();
 		}
 
-
+		//初始化操作
 		Thread.sleep(60000);
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
-		//初始化操作
-		HttpRequest.sendGet("http://127.0.0.1:8080/initOnlineUserNum", "date=" + df.format(new Date()));
+		HttpRequest.sendGet("http://127.0.0.1:8080/initialization", "date=" + df.format(new Date()));
+
+		long start = 0;
+		long end = 0;
 		//统计每个时刻看电视人数
 		while(true){
-			Thread.sleep(1000);
-			String s = HttpRequest.sendGet("http://127.0.0.1:8080/nowWatchTVNum", "date=" + df.format(new Date()));
+			Thread.sleep(1000 - (end - start));//保证1s发送一个请求
+			start = System.currentTimeMillis();
+			String s = HttpRequest.sendGet("http://127.0.0.1:8080/realtimeCalculation", "date=" + df.format(new Date()));
 			System.out.println(s);
+			end = System.currentTimeMillis();
 		}
 	}
 }
