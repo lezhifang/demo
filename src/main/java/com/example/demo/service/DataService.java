@@ -19,8 +19,8 @@ public class DataService {
         return dataDAO.addData(data);
     }
 
-    public List<Data> selectUserIdBydate(String date){
-        return dataDAO.selectUserIdBydate(date);
+    public List<Data> selectUserIdBydate(String start, String end){
+        return dataDAO.selectUserIdBydate(start, end);
     }
 
 }

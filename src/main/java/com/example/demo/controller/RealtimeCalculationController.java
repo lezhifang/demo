@@ -1,11 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Data;
-import com.example.demo.model.Hvalue;
-import com.example.demo.model.Lvalue;
-import com.example.demo.model.OnlineNumber;
+import com.example.demo.model.*;
 import com.example.demo.service.DataService;
 import com.example.demo.service.OnlineNumberService;
+import com.example.demo.service.TVshowsOnlineViewerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,23 +29,26 @@ public class RealtimeCalculationController {
     @Autowired
     private OnlineNumberService onlineNumberService;
     @Autowired
+    TVshowsOnlineViewerService tVshowsOnlineViewerService;
+    @Autowired
     private DataService dataService;
 
     @RequestMapping(path = {"/initialization"}, method = {RequestMethod.GET})
+    @ResponseBody
     public String initialization(Model model, @RequestParam(value = "date") String date) throws ParseException {
-        //将MySQL数据库中当前时间前5个心跳周期的数据添加到HashMap中   初始化HashMap
+        //将MySQL数据库中date时间前5个心跳周期的数据添加到HashMap中   初始化HashMap
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(df.parse(date));
-        calendar.add(Calendar.SECOND, -50);//用于计算5个心跳周期的起始时间  大于这个时间，即：数据库查询条件date>#{date}
-        String startDate = new SimpleDateFormat("yyyyMMddHHmmss").format(calendar.getTime());
-        System.out.println("----------------" + startDate + "----------------");
-        List<Data> datas = dataService.selectUserIdBydate(startDate);
+        calendar.add(Calendar.SECOND, -50);//用于计算5个心跳周期的起始时间  即：数据库查询条件date>=#{start} and date<#{end}
+        String start = new SimpleDateFormat("yyyyMMddHHmmss").format(calendar.getTime());
+        //System.out.println("----------------" + start + "----------------");
+        List<Data> datas = dataService.selectUserIdBydate(start, date);
 
         for(Data data : datas){
             int userId = data.getUserId();
             int showName = data.getShowName();
-            if(map.containsKey(userId)){//已存在该用户Id    //userId用户发送请求数+1,当前看的电视节目若为心跳，则节目不变）
+            if(map.containsKey(userId)){//已存在该用户Id    userId用户发送请求数+1,当前看的电视节目若为心跳，则节目不变
                 map.get(userId).setCunt( map.get(userId).getCunt() + 1 );
 
                 if(showName != -1){
@@ -68,10 +68,10 @@ public class RealtimeCalculationController {
             ++showCount[index];//索引对应相应的节目  例如：索引0存放当前看节目名称为0的总人数
         }
 
-        //初始化LinkedList，即：只保留当前时间前5个心跳周期的数据
+        //初始化LinkedList，即：只保留date时间前5个心跳周期的数据
         synchronized (list){
             while(true){
-                if(list.size()!=0  && (list.getLast().getDate()).compareTo(startDate) <= 0) {
+                if(list.size()!=0  && (list.getLast().getDate()).compareTo(start) < 0) {
                     list.removeLast();
                     System.out.println(date + "\tlist初始化时候\t" + list.size() +  "\t" + list.toString());//-----------------------------------------------
                 }else{
@@ -79,20 +79,12 @@ public class RealtimeCalculationController {
                 }
             }
         }
-
-        model.addAttribute("date", date);
-        model.addAttribute("onlineNum", onlineNum);
-
-        //存入数据库中
-        OnlineNumber onlineNumber = new OnlineNumber().setDate(date).setUserNumber(onlineNum);
-        onlineNumberService.addWatchTVNum(onlineNumber);
-
-        return "nowWatchTVNum";//修改成实时显示页面  用于显示当前人数
+        return "初始化成功";
     }
 
     @RequestMapping(path = {"/realtimeCalculation"}, method = {RequestMethod.GET})
     public String realtimeCalculation(Model model, @RequestParam(value = "date") String date) throws ParseException {
-        System.out.println("请求开始时间" + date);//-----------------------------------
+        System.out.println("请求开始时间\t" + date);//-----------------------------------
 
         //添加date时间用户请求
         synchronized (list){
@@ -105,9 +97,9 @@ public class RealtimeCalculationController {
                         map.get(userId).setCunt( map.get(userId).getCunt() + 1 );
 
                         if(showName != -1){//非心跳
-                            map.get(userId).setShowName(showName);
                             --showCount[map.get(userId).getShowName()];
                             ++showCount[showName];
+                            map.get(userId).setShowName(showName);
                         }
                         System.out.println(date + "\tmap实时计算时候\t" + map.toString());//-------------------
                     }else{//不存在该用户Id
@@ -162,9 +154,15 @@ public class RealtimeCalculationController {
         model.addAttribute("date", date);
         model.addAttribute("onlineNum", onlineNum);
 
-        //存入数据库中
+        //实时在线人数存入数据库中
         OnlineNumber onlineNumber = new OnlineNumber().setDate(date).setUserNumber(onlineNum);
         onlineNumberService.addWatchTVNum(onlineNumber);
+
+        //每个节目有多少人在看参入数据库
+        for(int i = 0; i < showCount.length; i ++){
+            TVshowsOnlineViewer viewer = new TVshowsOnlineViewer(date, i, showCount[i]);
+            tVshowsOnlineViewerService.addTVshowsOnlineViewer(viewer);
+        }
 
         return "nowWatchTVNum";
     }

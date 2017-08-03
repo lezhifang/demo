@@ -3,6 +3,7 @@ package com.example.demo.dao;
 import com.example.demo.model.Data;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface DataDAO {
             ") values (#{userId},#{date},#{userBehavior},#{showName})"})
     int addData(Data data);
 
-    @Select({"select ", SELECT_FIELDS, " from ", TABLE_NAME, "where date > #{date}"})
-    List<Data> selectUserIdBydate(String date);
+    @Select({"select ", SELECT_FIELDS, " from ", TABLE_NAME, "where date>=#{start} and date<#{end}"})
+    List<Data> selectUserIdBydate(@Param("start") String start, @Param("end") String end);
+
 }

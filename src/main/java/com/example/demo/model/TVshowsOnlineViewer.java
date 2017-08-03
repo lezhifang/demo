@@ -21,24 +21,27 @@ public class TVshowsOnlineViewer {
         return date;
     }
 
-    public void setDate(String date) {
+    public TVshowsOnlineViewer setDate(String date) {
         this.date = date;
+        return this;
     }
 
     public int getShowName() {
         return showName;
     }
 
-    public void setShowName(int showName) {
+    public TVshowsOnlineViewer setShowName(int showName) {
         this.showName = showName;
+        return this;
     }
 
     public int getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public TVshowsOnlineViewer setCount(int count) {
         this.count = count;
+        return this;
     }
 
     @Override
